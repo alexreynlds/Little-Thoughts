@@ -2,16 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class MainMenuScript : MonoBehaviour
 {
     public Material[] skies;
     
     private string curTime;
+    private GameObject timeText;
+
+    private void Awake(){
+        curTime = (System.DateTime.Now.ToString("HH"));
+        timeText = GameObject.Find("TimeText");
+    }
 
     private void Start(){
-         curTime = (System.DateTime.Now.ToString("HH"));
-
+       
         // Change sky on start screen depending on the time of day
         // Night Time
         if(curTime == "22" || curTime == "23" || curTime == "24" || curTime == "0" || curTime == "1" || curTime == "2" || curTime == "3" || curTime == "4" || curTime == "5"){
@@ -32,7 +38,8 @@ public class MainMenuScript : MonoBehaviour
     }
 
     private void FixedUpdate(){
-   
+        curTime = (System.DateTime.Now.ToString("HH:mm"));
+        timeText.GetComponent<TextMeshProUGUI>().text = curTime;
     }
 
     public void PlayGame()
