@@ -16,8 +16,10 @@ const App = () => {
             initialRouteName="Home"
             backBehavior="history"
             activeColor="#f0edf6"
-            inactiveColor="black"
+            inactiveColor="grey"
             barStyle={{ backgroundColor: '#694fad' }}
+            shifting={true}
+            labeled={true}
         >
             <Tab.Screen
                 name="Library"
