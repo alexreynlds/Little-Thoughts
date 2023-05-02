@@ -1,10 +1,18 @@
-import * as React from 'react'
-import { Text, Box, VStack, useColorModeValue } from 'native-base'
+// import * as React from 'react'
+import React, { useContext } from 'react'
+import { Text, Box, VStack, useColorModeValue, Button } from 'native-base'
 import Masthead from '../components/masthead'
 import AnimatedColourBox from '../components/animated-colour-box'
 import { Canvas } from '@react-three/fiber'
+import { AppContext, AppContextType } from '../app-context'
 
 export default function MainScreen() {
+    const { coins, setCoins } = useContext<AppContextType>(AppContext)
+
+    const testClick = () => {
+        setCoins(coins + 1)
+    }
+
     return (
         <AnimatedColourBox
             flex={1}
@@ -14,17 +22,8 @@ export default function MainScreen() {
             <Masthead title="Hello" image={require('../assets/testimage.jpeg')}>
                 <Text></Text>
             </Masthead>
-            {/* <VStack space={5} alignItems="center">
-                <Box p={10} bg={useColorModeValue('red.500', 'yellow.500')}>
-                    <Text>Hello</Text>
-                </Box>
-                <Canvas>
-                    <mesh>
-                        <sphereGeometry />
-                        <meshStandardMaterial color="hotpink" />
-                    </mesh>
-                </Canvas>
-            </VStack> */}
+            <Text>Coins: {coins}</Text>
+            <Button onPress={testClick}>test</Button>
             <Canvas>
                 <mesh>
                     <sphereGeometry />

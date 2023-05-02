@@ -28,7 +28,7 @@ const App = () => {
                     tabBarIcon: ({ color }) => (
                         <Icon
                             as={FontAwesome}
-                            name="home"
+                            name="book"
                             size={6}
                             color={useColorModeValue('black', 'white')}
                         />
@@ -56,7 +56,7 @@ const App = () => {
                     tabBarIcon: ({ color }) => (
                         <Icon
                             as={FontAwesome}
-                            name="book"
+                            name="home"
                             size={6}
                             color={useColorModeValue('black', 'white')}
                         />
