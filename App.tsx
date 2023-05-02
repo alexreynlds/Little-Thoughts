@@ -1,22 +1,62 @@
-import AppContainer from './src/components/app-container'
-import React from 'react'
-import Navigator from './src/'
-import 'react-native-gesture-handler'
-import { AppContext, AppContextType } from './src/app-context'
+// @ts-nocheck
+import { StatusBar } from "expo-status-bar"
+import { StyleSheet, Text, View } from "react-native"
+import { NavigationContainer } from "@react-navigation/native"
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
+import { NativeBaseProvider } from "native-base"
+import { auth } from "./firebase"
+import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth"
+import React, { useState, useEffect } from "react"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import AppContainer from "./src/components/AppContainer"
+import Navigator from "./src/"
+import { useNavigation } from "@react-navigation/native"
+
+const Stack = createNativeStackNavigator()
 
 export default function App() {
-    const [coins, setCoins] = React.useState(0)
+    useEffect(() => {
+        const checkLogin = async () => {
+            const email = await AsyncStorage.getItem("email")
+            const password = await AsyncStorage.getItem("password")
 
-    const appContextValue: AppContextType = {
-        coins,
-        setCoins
-    }
+            if (email && password) {
+                // console.log("we have both email and password")
+                signInWithEmailAndPassword(auth, email, password, true)
+                    .then((userCredential) => {
+                        const user = userCredential.user
+                    })
+                    .catch((error) => {
+                        const errorCode = error.code
+                        const errorMessage = error.message
+                    })
+            } else {
+                console.log("we have no email and password")
+            }
+        }
+        checkLogin()
+    }, [])
 
     return (
-        <AppContext.Provider value={appContextValue}>
-            <AppContainer>
-                <Navigator />
-            </AppContainer>
-        </AppContext.Provider>
+        // <NativeBaseProvider>
+        //     <NavigationContainer>
+        //         <Stack.Navigator>
+        //             <Stack.Screen options={{ headerShown: false }} name="Login" component={LoginScreen} />
+        //             <Stack.Screen name="Home" component={HomeScreen} />
+        //         </Stack.Navigator>
+        //     </NavigationContainer>
+        // </NativeBaseProvider>
+        <AppContainer>
+            <Navigator />
+        </AppContainer>
     )
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: "#fff",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+})
