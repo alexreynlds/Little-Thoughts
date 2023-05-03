@@ -1,60 +1,66 @@
 // @ts-nocheck
 import { StyleSheet, TouchableOpacity, View } from "react-native"
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation, useFocusEffect, useIsFocused } from "@react-navigation/native"
 import React, { useEffect, useState, useContext } from "react"
 import { auth } from "../../firebase"
-import LoginScreen from "./LoginScreen"
-import { Container, KeyboardAvoidingView, Text, Input, Button, Box, Center, Header } from "native-base"
+import { Container, KeyboardAvoidingView, Text, Input, Button, Box, Center, Heading, useColorModeValue } from "native-base"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth"
 import { AppContext, AppContextType } from "../AppContext"
+import { useColorMode } from "native-base"
 
 const HomeScreen = () => {
-    const { canSeeLogin, setCanSeeLogin } = useContext(AppContext)
+    const isFocused = useIsFocused()
     const { coins, setCoins } = useContext(AppContext)
     const Navigation = useNavigation()
+    const [user, setUser] = useState(null)
+    const [username, setUsername] = useState("")
 
-    const handleLogout = () => {
-        auth.signOut()
-            .then(() => {
-                AsyncStorage.removeItem("email")
-                AsyncStorage.removeItem("password")
-                Navigation.navigate("Login")
-            })
-            .catch((error) => {
-                console.log(error.message)
-            })
+    const getUsername = () => {
+        AsyncStorage.getItem("username").then((value) => {
+            setUsername(value)
+        })
+    }
+
+    useEffect(() => {
+        const getUsername = async () => {
+            const username = await AsyncStorage.getItem("username")
+            setUsername(username)
+        }
+        getUsername()
+
+        setUser(auth.currentUser)
+    }, [isFocused])
+
+    function checkAuth() {
+        return new Promise((resolve, reject) => {
+            onAuthStateChanged(
+                auth,
+                (user) => {
+                    if (user) {
+                        resolve(true)
+                    } else {
+                        resolve(false)
+                    }
+                },
+                reject
+            )
+        })
     }
 
     return (
-        <Center p={20} bgColor="blue.100" h="100%">
-            <Text>Email: {auth.currentUser?.email}</Text>
-            <Button onPress={handleLogout}>
-                <Text>Logout</Text>
-            </Button>
-            <Text>Coins: {coins}</Text>
-        </Center>
+        <Box safeArea bg={useColorModeValue("primary.50", "primary.900")}>
+            <View>
+                <Box></Box>
+                <Center p={5} h="100%">
+                    <Heading size="xl" mb={20}>
+                        Welcome back: {username}!
+                    </Heading>
+                    <Text>email: {auth.currentUser?.email}</Text>
+                </Center>
+            </View>
+        </Box>
     )
 }
 
 export default HomeScreen
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    button: {
-        backgroundColor: "#2B3e49",
-        width: "50%",
-        marginTop: 15,
-        padding: 15,
-        borderRadius: 10,
-        alignItems: "center",
-    },
-    buttonText: {
-        color: "white",
-        fontWeight: "700",
-        fontSize: 16,
-    },
-})

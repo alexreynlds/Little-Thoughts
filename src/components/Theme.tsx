@@ -18,6 +18,9 @@ const colours = {
         800: "#223044",
         900: "#111822",
     },
+    brand: {
+        100: "#2b3e49",
+    },
 }
 
 export default extendTheme({ config, colours })
