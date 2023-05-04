@@ -97,27 +97,6 @@ const SettingsScreen = () => {
                     </Heading>
                     <VStack space={5} height="80%">
                         <Center>
-                            <Text fontSize="xl" mb={2}>
-                                Volume Controls
-                            </Text>
-                            <FormControl>
-                                <FormControl.Label mt={2}>Music</FormControl.Label>
-                                <Slider w="full" defaultValue={50} minValue={0} maxValue={100} mb={2}>
-                                    <Slider.Track>
-                                        <Slider.FilledTrack />
-                                    </Slider.Track>
-                                    <Slider.Thumb />
-                                </Slider>
-                                <FormControl.Label mt={2}>Sound Effects</FormControl.Label>
-                                <Slider w="full" defaultValue={70} minValue={0} maxValue={100} mb={2}>
-                                    <Slider.Track>
-                                        <Slider.FilledTrack />
-                                    </Slider.Track>
-                                    <Slider.Thumb />
-                                </Slider>
-                            </FormControl>
-                        </Center>
-                        <Center>
                             <FormControl>
                                 <FormControl.Label mt={2}>Change Username</FormControl.Label>
                                 <Input placeholder="Username" type="text" value={newUsername} onChangeText={(text) => setNewUsername(text)} h="50px" my={2} bgColor={useColorModeValue("dark.600", "dark.600")} color="black" fontSize={"xl"} borderRadius={15} />

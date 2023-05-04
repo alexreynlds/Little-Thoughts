@@ -99,9 +99,6 @@ const LoginScreen = () => {
                     email: userCredential.user.email,
                     username: userCredential.user.email.split("@")[0],
                     createdAt: new Date(),
-                    coins: 0,
-                }).then(() => {
-                    // navigation.navigate("Home")
                 })
             })
             .catch((error) => {

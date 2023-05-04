@@ -12,7 +12,6 @@ const GardenScene = () => {
                     <Heading size="xl" mb={20}>
                         Welcome back: {auth.currentUser?.displayName}!
                     </Heading>
-                    <Text>Email: {}</Text>
                 </Center>
             </View>
         </Box>

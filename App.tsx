@@ -1,17 +1,28 @@
 // @ts-nocheck
-// import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { auth } from "./firebase"
 import { signInWithEmailAndPassword } from "firebase/auth"
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, Component } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import AppContainer from "./src/components/AppContainer"
-import Navigator, { LoginScreenNavigator } from "./src/"
+import Navigator, { LoginScreenNavigator } from "./index"
 import { AppContext, AppContextType } from "./src/AppContext"
 import { NavigationContainer, useNavigation } from "@react-navigation/native"
 import { useColorMode } from "native-base"
 import Toast from "react-native-toast-message"
+import { Audio } from "expo-av"
 
 export default function App() {
+    // const setAudioMode = async () => {
+    //     await Audio.setAudioModeAsync({
+    //         staysActiveInBackground: true,
+    //         interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+    //         shouldDuckAndroid: true,
+    //         playThroughEarpieceAndroid: true,
+    //         allowsRecordingIOS: true,
+    //         playsInSilentModeIOS: true,
+    //     })
+    // }
+
     const { colorMode, toggleColorMode } = useColorMode()
     const [isLogged, setIsLogged] = useState(false)
     const [coins, setCoins] = useState(0)
@@ -48,6 +59,7 @@ export default function App() {
     }
 
     useEffect(() => {
+        // setAudioMode()
         _retrieveData()
     }, [])
 
