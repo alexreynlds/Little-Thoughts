@@ -11,19 +11,11 @@ import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth"
 import React, { useEffect, useState, useContext } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useNavigation } from "@react-navigation/native"
-import ShopScreen from "./src/screens/ShopScreen"
-import GardenScene from "./src/screens/GardenScene"
+import TimerScreen from "./src/screens/TimerScreen"
 import { Ionicons } from "@expo/vector-icons"
 import { useColorMode } from "native-base"
 
-// import TrackPlayer from "react-native-track-player"
-
-// // AppRegistry.registerComponent(...);
-// TrackPlayer.registerPlaybackService(() => require("./service.js"))
-
-// const Tab = createMaterialBottomTabNavigator()
 const Tab = createBottomTabNavigator()
-// const FirstScreenNavigator = () => {
 function FirstScreenNavigator() {
     const { colorMode, toggleColorMode } = useColorMode()
     const [showSettings, setShowSettings] = React.useState(true)
@@ -91,34 +83,10 @@ function FirstScreenNavigator() {
                 tabBarActiveTintColor: useColorModeValue("black", "white"),
                 tabBarInactiveTintColor: "grey",
             })}>
-            <Tab.Screen
-                name="Library"
-                component={LibraryScreen}
-                // options={{
-                //     tabBarIcon: ({ color }) => <Icon as={FontAwesome} name="book" size={6} color={useColorModeValue("black", "white")} />,
-                // }}
-            />
-            <Tab.Screen
-                name="Home"
-                component={HomeScreen}
-                // options={{
-                //     tabBarIcon: ({ color }) => <Icon as={FontAwesome} name="home" size={6} color={useColorModeValue("black", "white")} />,
-                // }}
-            />
-            <Tab.Screen
-                name="Timer"
-                component={ShopScreen}
-                // options={{
-                //     tabBarIcon: ({ color }) => <Icon as={FontAwesome} name="money" size={6} color={useColorModeValue("black", "white")} />,
-                // }}
-            />
-            <Tab.Screen
-                name="Settings"
-                component={SettingsScreen}
-                // options={{
-                //     tabBarIcon: ({ color }) => <Icon as={FontAwesome} name="cog" size={6} color={useColorModeValue("black", "white")} />,
-                // }}
-            />
+            <Tab.Screen name="Library" component={LibraryScreen} />
+            <Tab.Screen name="Home" component={HomeScreen} />
+            <Tab.Screen name="Timer" component={TimerScreen} />
+            <Tab.Screen name="Settings" component={SettingsScreen} />
         </Tab.Navigator>
     )
 }

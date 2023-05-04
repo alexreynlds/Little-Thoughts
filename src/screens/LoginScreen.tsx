@@ -21,31 +21,6 @@ const LoginScreen = () => {
 
     const insets = useSafeAreaInsets()
 
-    // useEffect(() => {
-    //     const unsubscribe = onAuthStateChanged(auth, (user) => {
-    //         if (user) {
-    //             const docRef = doc(db, "users", user.uid)
-    //             getDoc(docRef)
-    //                 .then((docSnap) => {
-    //                     if (docSnap.exists()) {
-    //                         const data = docSnap.data()
-    //                         AsyncStorage.setItem("username", data.username)
-    //                     } else {
-    //                         console.log("No such document!")
-    //                     }
-    //                 })
-    //                 .catch((error) => {
-    //                     console.log("Error getting document:", error)
-    //                     AsyncStorage.setItem("username", "User")
-    //                 })
-
-    //             navigation.navigate("Home")
-    //         }
-    //     })
-
-    //     return unsubscribe
-    // }, [auth, navigation, handleLogin, handleRegister])
-
     useEffect(() => {
         const getColorMode = async () => {
             const colorMode = await AsyncStorage.getItem("colorMode")

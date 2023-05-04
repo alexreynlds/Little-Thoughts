@@ -11,7 +11,7 @@ import { TimerToggleButton } from "../components/TimerToggleButton"
 const POMODORO_TIME_MINUTES = 25 * 60 * 1000 // 25 minutes
 const BREAK_TIME_MINUTES = 5 * 60 * 1000
 
-const ShopScreen = () => {
+const TimerScreen = () => {
     const [timerCount, setTimerCount] = useState<number>(POMODORO_TIME_MINUTES)
     const [timerInterval, setTimerInterval] = useState<any>(null)
     const [timerIsRunning, setTimerIsRunning] = useState<boolean>(false)
@@ -54,7 +54,7 @@ const ShopScreen = () => {
     )
 }
 
-export default ShopScreen
+export default TimerScreen
 
 const styles = StyleSheet.create({
     container: {

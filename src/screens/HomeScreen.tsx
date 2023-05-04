@@ -23,6 +23,7 @@ const HomeScreen = () => {
     const { coins, setCoins } = useContext(AppContext)
     const [isRadioVisibile, setIsRadioVisibile] = useState(false)
     const [index, setIndex] = useState(0)
+
     // Clock information
     const [date, setDate] = useState(dayjs())
 
@@ -59,13 +60,6 @@ const HomeScreen = () => {
     const pauseSound = async () => {
         if (sound) {
             await sound.pauseAsync()
-            setIsPlaying(false)
-        }
-    }
-
-    const stopSound = async () => {
-        if (sound) {
-            await sound.stopAsync()
             setIsPlaying(false)
         }
     }
