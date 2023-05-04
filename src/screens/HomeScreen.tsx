@@ -7,61 +7,70 @@ import { Container, KeyboardAvoidingView, Text, Input, Button, Box, Center, Head
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth"
 import { AppContext, AppContextType } from "../AppContext"
-// import { Canvas } from "@react-three/fiber"
+import Toast from "react-native-toast-message"
+import { Ionicons } from "@expo/vector-icons"
+import dayjs from "dayjs"
+import { useSafeAreaInsets, SafeAreaView } from "react-native-safe-area-context"
 
 const HomeScreen = () => {
     const isFocused = useIsFocused()
     const { coins, setCoins } = useContext(AppContext)
     const Navigation = useNavigation()
-    const [user, setUser] = useState(null)
+    const insets = useSafeAreaInsets()
     const [username, setUsername] = useState("")
 
-    const getUsername = () => {
-        AsyncStorage.getItem("username").then((value) => {
-            setUsername(value)
-        })
-    }
+    // Clock information
+    const [date, setDate] = useState(dayjs())
 
     useEffect(() => {
-        const getUsername = async () => {
-            const username = await AsyncStorage.getItem("username")
-            setUsername(username)
-        }
-        getUsername()
+        const interval = setInterval(() => {
+            setDate(dayjs())
+        }, 1000 * 1)
 
-        setUser(auth.currentUser)
-    }, [isFocused])
-
-    function checkAuth() {
-        return new Promise((resolve, reject) => {
-            onAuthStateChanged(
-                auth,
-                (user) => {
-                    if (user) {
-                        resolve(true)
-                    } else {
-                        resolve(false)
-                    }
-                },
-                reject
-            )
-        })
-    }
+        return () => clearInterval(interval)
+    }, [])
 
     return (
-        <Box safeArea bg={useColorModeValue("primary.50", "primary.900")}>
+        <Center style={styles.masterContainer} bg={useColorModeValue("primary.50", "primary.900")} safeArea>
+            <Center bgColor="rgba(0, 0, 0, 0.5)" top={"70px"} w={300} borderRadius={40} p={4}>
+                <Text fontSize={20} fontWeight={500}>
+                    {date.format("dddd, DD MMMM")}
+                </Text>
+                <Text fontSize={60} fontWeight={"bold"}>
+                    {date.format("HH:mm")}
+                </Text>
+                {/* Icons and text that changes depending on the time of day */}
+                <Ionicons name={date.hour() >= 6 && date.hour() < 18 ? "sunny-outline" : "moon-outline"} size={50} color={"white"} position={"absolute"} right={20} />
+                <Text>
+                    {date.hour() >= 6 && date.hour() < 12 && `Good morning, ${auth.currentUser?.displayName}`}
+                    {date.hour() >= 12 && date.hour() < 18 && `Good afternoon, ${auth.currentUser?.displayName}`}
+                    {date.hour() >= 18 || (date.hour() < 6 && `Good evening, ${auth.currentUser?.displayName}`)}
+                </Text>
+            </Center>
             <View>
-                <Box></Box>
                 <Center p={5} h="100%">
-                    <Heading size="xl" mb={20}>
-                        Welcome back: {username}!
-                    </Heading>
                     <Text>email: {auth.currentUser?.email}</Text>
-                    {/* <Canvas></Canvas> */}
                 </Center>
             </View>
-        </Box>
+        </Center>
     )
 }
 
 export default HomeScreen
+
+const styles = StyleSheet.create({
+    masterContainer: {
+        alignItems: "center",
+        justifyContent: "center",
+        alignContent: "center",
+        height: "100%",
+    },
+    date: {
+        color: "#C3FFFE",
+        fontSize: 20,
+        marginTop: 20,
+    },
+    time: {
+        fontSize: 40,
+    },
+})

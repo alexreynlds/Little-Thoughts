@@ -9,6 +9,7 @@ import Navigator, { LoginScreenNavigator } from "./src/"
 import { AppContext, AppContextType } from "./src/AppContext"
 import { NavigationContainer, useNavigation } from "@react-navigation/native"
 import { useColorMode } from "native-base"
+import Toast from "react-native-toast-message"
 
 export default function App() {
     const { colorMode, toggleColorMode } = useColorMode()
@@ -28,6 +29,11 @@ export default function App() {
                 const password = await AsyncStorage.getItem("password")
                 signInWithEmailAndPassword(auth, email, password)
                     .then((userCredential) => {
+                        Toast.show({
+                            type: "success",
+                            text1: "Successfully Logged In!",
+                            text2: "Welcome back!",
+                        })
                         const user = userCredential.user
                         return true
                     })
@@ -50,6 +56,7 @@ export default function App() {
             <AppContainer>
                 <NavigationContainer>
                     <Navigator isLoggedIn={isLogged} />
+                    <Toast />
                 </NavigationContainer>
             </AppContainer>
         </AppContext.Provider>

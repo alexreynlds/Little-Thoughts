@@ -10,6 +10,7 @@ import { useFocusEffect } from "@react-navigation/native"
 import { doc, getDoc, setDoc } from "firebase/firestore"
 import { useSafeAreaInsets, SafeAreaView } from "react-native-safe-area-context"
 import ThemeToggle from "../components/ThemeToggle"
+import Toast from "react-native-toast-message"
 
 const SettingsScreen = () => {
     const { colorMode, toggleColorMode } = useColorMode()
@@ -68,9 +69,19 @@ const SettingsScreen = () => {
             .then(() => {
                 console.log("Document successfully written!")
                 AsyncStorage.setItem("username", newUsername)
+                Toast.show({
+                    type: "success",
+                    text1: "Username changed!",
+                    text2: "Your username has been changed successfully!",
+                })
             })
             .catch((error) => {
                 console.error("Error writing document: ", error)
+                Toast.show({
+                    type: "error",
+                    text1: "Error changing username!",
+                    text2: "There was an error changing your username. Please try again.",
+                })
             })
         updateUsername()
         Keyboard.dismiss()
@@ -109,7 +120,7 @@ const SettingsScreen = () => {
                         <Center>
                             <FormControl>
                                 <FormControl.Label mt={2}>Change Username</FormControl.Label>
-                                <Input placeholder="Username" type="text" value={newUsername} onChangeText={(text) => setNewUsername(text)} h="50px" my={2} bgColor={useColorModeValue("dark.100", "dark.600")} color="white" fontSize={"xl"} borderRadius={15} />
+                                <Input placeholder="Username" type="text" value={newUsername} onChangeText={(text) => setNewUsername(text)} h="50px" my={2} bgColor={useColorModeValue("dark.600", "dark.600")} color="black" fontSize={"xl"} borderRadius={15} />
                                 <Button onPress={changeUsername}>
                                     <Text>Change Username</Text>
                                 </Button>

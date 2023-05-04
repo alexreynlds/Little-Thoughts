@@ -10,7 +10,7 @@ import { serverTimestamp } from "firebase/firestore"
 import { Camera, CameraType, requestCameraPermissionsAsync } from "expo-camera"
 import * as ImagePicker from "expo-image-picker"
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
-import Dropdown from "react-dropdown"
+import Toast from "react-native-toast-message"
 
 const PreviousPosts = () => {
     const [diaryEntires, setDiaryEntries] = useState([])
@@ -33,9 +33,17 @@ const PreviousPosts = () => {
         try {
             const dbRef = doc(db, "diaryEntries", auth.currentUser.uid, "entries", id)
             await deleteDoc(dbRef)
-            console.log("Diary entry deleted!")
+            Toast.show({
+                type: "success",
+                text1: "Diary entry deleted!",
+                text2: "Your diary entry has been deleted successfully!",
+            })
         } catch (error) {
-            console.error("Error deleting diary entry:", error)
+            Toast.show({
+                type: "error",
+                text1: "Error deleting diary entry!",
+                text2: "There was an error deleting your diary entry!",
+            })
         }
     }
 
@@ -104,6 +112,11 @@ const LibraryScreen = () => {
             console.log(result)
 
             if (!result.canceled && result.assets && result.assets.length > 0) {
+                Toast.show({
+                    type: "success",
+                    text1: "Image selected!",
+                    text2: "You can now submit your entry!",
+                })
                 setSelectedImage(result.assets[0].uri)
             }
         } catch (error) {
@@ -124,6 +137,11 @@ const LibraryScreen = () => {
             console.log("Diary entry created!")
             setSelectedImage(null)
             setIsModalVisible(false)
+            Toast.show({
+                type: "success",
+                text1: "Diary entry created!",
+                text2: "Your diary entry has been created successfully!",
+            })
         } catch (error) {
             console.error("Error creating diary entry:", error)
         }
