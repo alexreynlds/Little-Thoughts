@@ -1,42 +1,33 @@
 // @ts-nocheck
+// @ts-ignore
 import React, { useEffect, useState } from "react"
-import { Text, Box, VStack, Heading, useColorModeValue, View, Center, FormControl, Input, Button, ScrollView, Hidden, Select, TextArea } from "native-base"
-import { useColorMode } from "native-base"
+import { Text, Box, VStack, Heading, useColorModeValue, View, Center, FormControl, Input, Button, Modal, Pressable, TextArea, Image, FlatList } from "native-base"
 import { auth, db } from "../../firebase"
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile } from "firebase/auth"
 import { Keyboard, TouchableWithoutFeedback, StyleSheet } from "react-native"
+import { Picker } from "@react-native-picker/picker"
 import { doc, getDoc, setDoc, addDoc, collection, query, orderBy, onSnapshot, deleteDoc, Timestamp } from "firebase/firestore"
 import { serverTimestamp } from "firebase/firestore"
-import { format } from "date-fns"
+import { Camera, CameraType, requestCameraPermissionsAsync } from "expo-camera"
+import * as ImagePicker from "expo-image-picker"
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
+import Dropdown from "react-dropdown"
 
-const LibraryScreen = () => {
-    const [newDiaryEntry, setNewDiaryEntry] = useState({
-        title: "",
-        rating: "",
-        mainText: "",
-        createdAt: Timestamp.now().toDate(),
-    })
+const PreviousPosts = () => {
     const [diaryEntires, setDiaryEntries] = useState([])
+    const insets = useSafeAreaInsets()
     const diaryCollectionRef = collection(db, "diaryEntries", auth.currentUser.uid, "entries")
+    const [image, setImage] = useState(null)
 
-    const handleChange = (value, key) => {
-        setNewDiaryEntry((prevState) => ({ ...prevState, [key]: value }))
-    }
-
-    const getDiaryDate = async () => {
-        try {
-            const dbRef = doc(db, "diaryEntries", auth.currentUser.uid, "entries")
-            const docSnap = await getDoc(dbRef)
-            if (docSnap.exists()) {
-                console.log("Document data:", docSnap.data())
-                return docSnap.data()
-            } else {
-                console.log("No such document!")
-            }
-        } catch (error) {
-            console.error("Error getting document:", error)
-        }
-    }
+    useEffect(() => {
+        const q = query(diaryCollectionRef, orderBy("createdAt", "desc"))
+        onSnapshot(q, (snapshot) => {
+            const diaryEntry = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }))
+            setDiaryEntries(diaryEntry)
+        })
+    }, [])
 
     const handleDeleteDiaryEntry = async (id) => {
         try {
@@ -48,12 +39,91 @@ const LibraryScreen = () => {
         }
     }
 
+    return (
+        <FlatList
+            style={{ height: "100%" }}
+            w={"350px"}
+            data={diaryEntires}
+            numcolumns={1}
+            borderRadius={15}
+            borderWidth={5}
+            borderColor={useColorModeValue("dark.100", "dark.600")}
+            renderItem={({ item }) => (
+                <Pressable m={5} bgColor={"gray.300"} borderRadius={10} borderWidth={5} p={5} minHeight={200}>
+                    <View>
+                        <Text color="black" fontWeight={"bold"} fontSize={"2xl"}>
+                            {item.title}
+                        </Text>
+                        <Text color="black" fontSize={"lg"}>
+                            Overall mood: {item.rating}
+                        </Text>
+                        <Text color="black" fontSize={"lg"}>
+                            {item.mainText}
+                        </Text>
+
+                        <Image source={{ uri: item.image }} style={{ width: 200, height: 200 }} alt="library image" borderRadius={10} />
+                        <Button onPress={() => handleDeleteDiaryEntry(item.id)} position={"absolute"} right={0} bgColor={"red.500"}>
+                            X
+                        </Button>
+                    </View>
+                </Pressable>
+            )}
+        />
+    )
+}
+
+const LibraryScreen = () => {
+    const [status, requestPermission] = Camera.useCameraPermissions()
+    const [isModalVisible, setIsModalVisible] = useState(false)
+
+    const [newDiaryEntry, setNewDiaryEntry] = useState({
+        title: "",
+        rating: "",
+        mainText: "",
+        createdAt: Timestamp.now().toDate(),
+    })
+    const [diaryEntires, setDiaryEntries] = useState([])
+    const diaryCollectionRef = collection(db, "diaryEntries", auth.currentUser.uid, "entries")
+    const [selectedImage, setSelectedImage] = useState(null)
+
+    const [image, setImage] = useState(null)
+
+    const handleChange = (value, key) => {
+        setNewDiaryEntry((prevState) => ({ ...prevState, [key]: value }))
+    }
+
+    const pickImage = async () => {
+        try {
+            let result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.All,
+                allowsEditing: true,
+                aspect: [4, 3],
+                quality: 1,
+            })
+
+            console.log(result)
+
+            if (!result.canceled && result.assets && result.assets.length > 0) {
+                setSelectedImage(result.assets[0].uri)
+            }
+        } catch (error) {
+            console.error("Error selecting image:", error)
+        }
+    }
+
     const handleCreateDiaryEntry = async () => {
         try {
             Keyboard.dismiss()
             const dbRef = collection(db, "diaryEntries", auth.currentUser.uid, "entries")
-            await addDoc(dbRef, newDiaryEntry)
+            const newEntry = {
+                ...newDiaryEntry,
+                image: selectedImage,
+                createdAt: serverTimestamp(),
+            }
+            await addDoc(dbRef, newEntry)
             console.log("Diary entry created!")
+            setSelectedImage(null)
+            setIsModalVisible(false)
         } catch (error) {
             console.error("Error creating diary entry:", error)
         }
@@ -70,61 +140,47 @@ const LibraryScreen = () => {
         })
     }, [])
 
+    useEffect(() => {
+        requestCameraPermissionsAsync()
+    })
     return (
-        <View style={styles.container} safeArea bg={useColorModeValue("primary.50", "primary.900")}>
-            <VStack style={styles.container} space={15}>
-                <Center style={styles.container}>
-                    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-                        <View w={"90%"} p={0} rounded="2xl" mt={10}>
-                            <Heading mb={1} fontSize="4xl" color={useColorModeValue("black", "white")} textAlign={"center"}>
-                                <Text underline>Library</Text>
-                            </Heading>
-                            <Center>
-                                <Heading size={"md"}>New Entry</Heading>
-                                <FormControl>
-                                    <FormControl.Label>Title</FormControl.Label>
-                                    <Input placeholder="Title" type="text" onChangeText={(text) => handleChange(text, "title")} h="50px" bgColor={useColorModeValue("dark.100", "dark.600")} color="white" fontSize={"xl"} borderRadius={15} />
-                                    <FormControl.Label>Rating</FormControl.Label>
-                                    {/* <Input placeholder="Rating" type="text" onChangeText={(text) => handleChange(text, "rating")} h="50px" bgColor="dark.100" color="white" fontSize={"xl"} borderRadius={15} /> */}
-                                    <Select placeholder="Rating" type="text" h="50px" onValueChange={(itemValue) => handleChange(itemValue, "rating")} bgColor={useColorModeValue("dark.100", "dark.600")} color="white" fontSize={"xl"} borderRadius={15}>
-                                        <Select.Item label="1 - very good" value="very good" />
-                                        <Select.Item label="2 - good" value="good" />
-                                        <Select.Item label="3 - alright" value="alright" />
-                                        <Select.Item label="4 - bad" value="bad" />
-                                        <Select.Item label="5 - very bad" value="very bad" />
-                                    </Select>
-                                    <FormControl.Label>Main</FormControl.Label>
-                                    <TextArea placeholder="Main" type="text" onChangeText={(text) => handleChange(text, "mainText")} h={20} bgColor={useColorModeValue("dark.100", "dark.600")} color="white" fontSize={"xl"} borderRadius={15} />
-                                    <Button onPress={handleCreateDiaryEntry} mt={2}>
-                                        Submit
-                                    </Button>
-                                </FormControl>
-                            </Center>
-                        </View>
-                    </TouchableWithoutFeedback>
-                </Center>
-                <Center style={styles.container} mt={10}>
-                    <ScrollView w={"100%"}>
-                        <Heading size={"md"}>Past Entries</Heading>
-                        {diaryEntires.length === 0 ? (
-                            <Text>No entries yet!</Text>
-                        ) : (
-                            diaryEntires.map((entry) => (
-                                <Box key={entry.id} bg={useColorModeValue("white", "gray.700")} shadow={1} rounded="lg" width="100%" p={2} _text={{ color: "black" }} my={2} p={5}>
-                                    <Text fontSize={"2xl"}>{entry.title}</Text>
-                                    <Text>{format(entry.createdAt.toDate(), "dd MMM yyyy")}</Text>
-                                    <Text>Emotionally: {entry.rating}</Text>
-                                    <Text mt={3}>{entry.mainText}</Text>
-                                    <Button position={"absolute"} right="0" m={2} onPress={() => handleDeleteDiaryEntry(entry.id)} bgColor="red.600">
-                                        Delete
-                                    </Button>
-                                </Box>
-                            ))
-                        )}
-                    </ScrollView>
-                </Center>
-            </VStack>
-        </View>
+        <SafeAreaView style={styles.contentContainer}>
+            <Heading mb={5}>Library</Heading>
+            <Button onPress={() => setIsModalVisible(true)} w="200px">
+                <Text fontSize={"xl"}>Add new entry!</Text>
+            </Button>
+            <Center style={styles.container} h={"100%"}>
+                <Heading fontSize="lg">Previous Entries</Heading>
+                <PreviousPosts />
+            </Center>
+            <Modal isOpen={isModalVisible} onClose={() => setIsModalVisible(false)}>
+                <Modal.Content maxWidth="400px">
+                    <Modal.CloseButton onPress={() => setIsModalVisible(false)} />
+                    <Modal.Header>Add a new diary entry</Modal.Header>
+                    <Modal.Body>
+                        <FormControl.Label>Entry Title</FormControl.Label>
+                        <Input placeholder="Title" type="text" onChangeText={(text) => handleChange(text, "title")} h="40px" bgColor={useColorModeValue("dark.100", "dark.600")} color="black" fontSize={"xl"} borderRadius={15} />
+                        <FormControl.Label>Emotional Rating</FormControl.Label>
+                        <Picker selectedValue={newDiaryEntry.rating} onValueChange={(itemValue) => handleChange(itemValue, "rating")} h="40px" bgColor={"white"} color="white" fontSize={"xl"} borderRadius={15}>
+                            <Picker.Item label="1 - very good" value="very good" color="white" />
+                            <Picker.Item label="2 - good" value="good" color="white" />
+                            <Picker.Item label="3 - alright" value="alright" color="white" />
+                            <Picker.Item label="4 - bad" value="bad" color="white" />
+                            <Picker.Item label="5 - very bad" value="very bad" color="white" />
+                        </Picker>
+                        <FormControl.Label>Main Entry</FormControl.Label>
+                        <TextArea placeholder="Main" type="text" color="black" onChangeText={(text) => handleChange(text, "mainText")} h={20} bgColor={useColorModeValue("dark.100", "dark.600")} color="white" fontSize={"xl"} borderRadius={15} />
+                        <Button onPress={pickImage} mt={2}>
+                            Select an Image!
+                        </Button>
+                        {/* {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />} */}
+                        <Button onPress={handleCreateDiaryEntry} mt={2}>
+                            Submit
+                        </Button>
+                    </Modal.Body>
+                </Modal.Content>
+            </Modal>
+        </SafeAreaView>
     )
 }
 
@@ -133,14 +189,18 @@ export default LibraryScreen
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        width: "100%",
+
         justifyContent: "center",
         alignItems: "center",
         padding: 10,
+        backgroundColor: "#2b3e49",
     },
     contentContainer: {
         flex: 1,
-        // backgroundColor: "red",
+        height: "100%",
+        backgroundColor: "#2b3e49",
+        justifyContent: "center",
+        alignItems: "center",
     },
     footer: {
         backgroundColor: "white",
@@ -148,4 +208,22 @@ const styles = StyleSheet.create({
         justifyContent: "flex-end",
         height: 100,
     },
+    innerContainer: {
+        flex: 1,
+        flexDirection: "row",
+        borderColor: "black",
+        borderWidth: 3,
+        borderRadius: 10,
+        padding: 5,
+
+        minHeight: 200,
+        width: "80%",
+        margin: 10,
+        backgroundColor: "#2b3e49",
+        shadowColor: "black",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+    },
+
+    // container: {
 })

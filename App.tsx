@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { createNativeStackNavigator } from "@react-navigation/native-stack"
+// import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { auth } from "./firebase"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import React, { useState, useEffect } from "react"
@@ -9,8 +9,6 @@ import Navigator, { LoginScreenNavigator } from "./src/"
 import { AppContext, AppContextType } from "./src/AppContext"
 import { NavigationContainer, useNavigation } from "@react-navigation/native"
 import { useColorMode } from "native-base"
-
-const Stack = createNativeStackNavigator()
 
 export default function App() {
     const { colorMode, toggleColorMode } = useColorMode()
@@ -38,12 +36,9 @@ export default function App() {
                         const errorMessage = error.message
                     })
             } else {
-                console.log("unepic")
                 return false
             }
-        } catch (error) {
-            console.log(error)
-        }
+        } catch (error) {}
     }
 
     useEffect(() => {

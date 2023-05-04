@@ -8,9 +8,5 @@ type Props = {
 }
 
 export default function AppContainer(props: Props) {
-    return (
-        // <NavigationContainer>
-        <NativeBaseProvider theme={Theme}>{props.children}</NativeBaseProvider>
-        // </NavigationContainer>
-    )
+    return <NativeBaseProvider theme={Theme}>{props.children}</NativeBaseProvider>
 }

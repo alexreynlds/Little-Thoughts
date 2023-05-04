@@ -30,7 +30,6 @@ function FirstScreenNavigator() {
             const password = await AsyncStorage.getItem("password")
 
             if (email && password) {
-                // console.log("we have both email and password")
                 signInWithEmailAndPassword(auth, email, password)
                     .then((userCredential) => {
                         const user = userCredential.user
@@ -40,7 +39,6 @@ function FirstScreenNavigator() {
                         const errorMessage = error.message
                     })
             } else {
-                console.log("we have no email and password")
             }
         }
         checkLogin()
@@ -52,9 +50,7 @@ function FirstScreenNavigator() {
 
     const getInfo = async () => {
         const tempColorMode = await AsyncStorage.getItem("storedColorMode")
-        console.log(tempColorMode)
         if (tempColorMode === "dark" && colorMode === "light") {
-            console.log("awcdacaw")
             toggleColorMode()
         }
     }
@@ -152,10 +148,8 @@ function AppNavigator(props) {
             navigation.navigate("FirstStack", { screen: "Home" })
         }
     }, [props.isLoggedIn])
-    console.log(props.isLoggedIn)
 
     if (props.isLoggedIn === "true") {
-        console.log("ecawd")
         return (
             <Tab.Navigator initialRouteName="FirstStack" screenOptions={{ headerShown: false, tabBarStyle: { display: "none" } }}>
                 <Tab.Screen name="LoginStack" component={LoginScreenNavigator} />

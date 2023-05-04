@@ -7,7 +7,7 @@ import { Container, KeyboardAvoidingView, Text, Input, Button, Box, Center, Head
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth"
 import { AppContext, AppContextType } from "../AppContext"
-import { useColorMode } from "native-base"
+// import { Canvas } from "@react-three/fiber"
 
 const HomeScreen = () => {
     const isFocused = useIsFocused()
@@ -57,6 +57,7 @@ const HomeScreen = () => {
                         Welcome back: {username}!
                     </Heading>
                     <Text>email: {auth.currentUser?.email}</Text>
+                    {/* <Canvas></Canvas> */}
                 </Center>
             </View>
         </Box>

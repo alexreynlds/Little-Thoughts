@@ -3,12 +3,14 @@ import { Text, Box, VStack, Heading, useColorModeValue, View, Center, Button } f
 import { AppContext, AppContextType } from "../AppContext"
 import { useColorMode } from "native-base"
 import { auth } from "../../firebase"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 const ShopScreen = () => {
     const { coins, setCoins } = useContext<AppContextType>(AppContext)
 
     const testClick = () => {
         setCoins(coins + 1)
+        AsyncStorage.setItem("coins", coins.toString())
     }
 
     return (
