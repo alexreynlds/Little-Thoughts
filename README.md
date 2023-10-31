@@ -1,4 +1,4 @@
-Little Thoughts
+#Little Thoughts
 
 Little Thoughts is a small mobile application developed in react native for a univeristy cross-platform development module.
 
